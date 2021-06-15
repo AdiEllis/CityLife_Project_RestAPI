@@ -1,10 +1,6 @@
 package com.project.Models;
 
-import java.util.Objects;
-
-public class User {
-
-    private int id;
+public class User extends BaseEntitie {
     private String uid;
     private String firstName;
     private String lastName;
@@ -12,9 +8,9 @@ public class User {
     private String phone;
     private int permission;
     private int department;
-    private boolean deleted;
 
     public User(String uid, String firstName, String lastName, String email, String phone, int permission, int department, boolean deleted) {
+        super(deleted);
         this.uid = uid;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -22,13 +18,15 @@ public class User {
         this.phone = phone;
         this.permission = permission;
         this.department = department;
-        this.deleted = deleted;
+
     }
+
     public User() {
+        super();
     }
 
     public User(int id, String uid, String firstName, String lastName, String email, String phone, int permission, int department, boolean deleted) {
-        this.id = id;
+        super(id, deleted);
         this.uid = uid;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -36,19 +34,10 @@ public class User {
         this.phone = phone;
         this.permission = permission;
         this.department = department;
-        this.deleted = deleted;
     }
 
-    public String hashPassword(String password){
-
+    public String hashPassword(String password) {
         return password;
-    }
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getUid() {
@@ -105,13 +94,5 @@ public class User {
 
     public void setDepartment(int department) {
         this.department = department;
-    }
-
-    public boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 }

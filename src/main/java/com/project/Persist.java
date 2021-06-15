@@ -1,6 +1,7 @@
 package com.project;
 
 import com.project.Models.User;
+import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -8,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -29,7 +32,7 @@ public class Persist {
     }
 
     @PostConstruct
-    public void init () {
+    public void init() {
 
     }
 

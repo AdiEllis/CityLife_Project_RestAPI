@@ -28,8 +28,10 @@ public class UsersController {
 
     @RequestMapping(value = "/users/update", method = RequestMethod.POST)
     public User updateUser(@ModelAttribute("User") User user) {
-        //persist.save(user);
-        return user;
+        User oldUser = persist.loadObject(User.class, user.getId());
+        oldUser.setObject(user);
+        persist.save(oldUser);
+        return oldUser;
     }
 
     @GetMapping("/users/getUser")
