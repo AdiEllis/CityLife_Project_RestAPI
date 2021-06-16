@@ -9,7 +9,8 @@
         <property name="uid" column="uid" type="string"/>
         <property name="firstName" column="firstName" type="string"/>
         <property name="lastName" column="lastName" type="string"/>
-        <property name="email" column="email" type="string"/>
+        <property name="password" column="password" type="string"/>
+        <property name="email" column="email" unique="true" type="string"/>
         <property name="phone" column="phone" type="string"/>
         <property name="permission" column="permission" type="int"/>
         <property name="department" column="department" type="int"/>
