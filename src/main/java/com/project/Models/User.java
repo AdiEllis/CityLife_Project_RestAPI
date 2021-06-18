@@ -1,9 +1,7 @@
 package com.project.Models;
 
-import com.project.Utils.PasswordAuthentication;
 
 public class User extends BaseEntitie {
-    private PasswordAuthentication passwordAuthentication = new PasswordAuthentication();
 
     private String uid;
     private String firstName;
@@ -11,17 +9,19 @@ public class User extends BaseEntitie {
     private String password;
     private String email;
     private String phone;
+    private String token;
     private int permission;
     private int department;
 
-    public User(String uid, String firstName, String lastName, String password, String email, String phone, int permission, int department, boolean deleted) {
+    public User(String uid, String firstName, String lastName, String password, String email, String phone, String token, int permission, int department, boolean deleted) {
         super(deleted);
         this.uid = uid;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = passwordAuthentication.hash(password);
+        this.password = password;
         this.email = email;
         this.phone = phone;
+        this.token = token;
         this.permission = permission;
         this.department = department;
 
@@ -31,16 +31,31 @@ public class User extends BaseEntitie {
         super();
     }
 
-    public User(int id, String uid, String firstName, String lastName, String password, String email, String phone, int permission, int department, boolean deleted) {
+    public User(int id, String uid, String firstName, String lastName, String password, String email, String phone, String token, int permission, int department, boolean deleted) {
         super(id, deleted);
         this.uid = uid;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = passwordAuthentication.hash(password);
+        this.password = password;
         this.email = email;
         this.phone = phone;
+        this.token = token;
         this.permission = permission;
         this.department = department;
+    }
+
+    public boolean objectIsEmpty() {
+        if (isEmpty(this.uid) || isEmpty(this.firstName) || isEmpty(this.lastName) || isEmpty(this.password) || isEmpty(this.phone) || this.permission <= 0 || this.department <= 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isEmpty(CharSequence str) {
+        if (str == null || str.length() == 0)
+            return true;
+        else
+            return false;
     }
 
     public String getUid() {
@@ -72,7 +87,7 @@ public class User extends BaseEntitie {
     }
 
     public void setPassword(String password) {
-        this.password = passwordAuthentication.hash(password);
+        this.password = password;
     }
 
     public String getEmail() {
@@ -105,5 +120,13 @@ public class User extends BaseEntitie {
 
     public void setDepartment(int department) {
         this.department = department;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

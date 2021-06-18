@@ -12,10 +12,10 @@
         <property name="password" column="password" type="string"/>
         <property name="email" column="email" unique="true" type="string"/>
         <property name="phone" column="phone" type="string"/>
+        <property name="token" column="token" type="string"/>
         <property name="permission" column="permission" type="int"/>
         <property name="department" column="department" type="int"/>
         <property name="deleted" column="deleted" type="boolean"/>
     </class>
-
 
 </hibernate-mapping>
