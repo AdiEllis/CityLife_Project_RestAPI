@@ -56,14 +56,14 @@ public class UsersController implements Validator {
         user.setPassword(null); //unable to update password in this route.
 
         List<User> userRow = persist.getQuerySession().createQuery("FROM User WHERE id = :id")
-                .setParameter("id", user.getId())
+                .setParameter("id", user.getOid())
                 .list();
         if (userRow.isEmpty()) {
             responseModel = new BasicResponseModel(Definitions.USER_NOT_FOUND, Definitions.USER_NOT_FOUND_MSG);
         } else if (userRow.size() > 1) {
             responseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
         } else {
-            User oldUser = persist.loadObject(User.class, user.getId());
+            User oldUser = persist.loadObject(User.class, user.getOid());
             if (user.getEmail() != null && !user.getEmail().equals(userRow.get(0).getEmail())) {
                 if (!validator.isValid(user.getEmail())) {
                     responseModel = new BasicResponseModel(Definitions.INVALID_EMAIL, Definitions.INVALID_EMAIL_MSG);
@@ -149,7 +149,7 @@ public class UsersController implements Validator {
                 } else {
                     if (PasswordAuthentication.hashPassword(password).equals(user.get(0).getPassword())) {
                         String newToken = PasswordAuthentication.createLoginToken(user.get(0).getEmail(), user.get(0).getPassword());
-                        User userRow = persist.loadObject(User.class, user.get(0).getId());
+                        User userRow = persist.loadObject(User.class, user.get(0).getOid());
                         userRow.setToken(newToken);
                         responseModel = new BasicResponseModel(newToken);
                     } else {

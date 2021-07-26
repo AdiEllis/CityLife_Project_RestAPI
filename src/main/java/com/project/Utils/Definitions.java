@@ -1,6 +1,9 @@
 package com.project.Utils;
 
 public class Definitions {
+    public static final int INVALID_ARGUMENT = 1000;
+    public static final String INVALID_ARGUMENT_MSG = "Invalid Argument.";
+
     public static final int MISSING_FIELDS = 500;
     public static final String MISSING_FIELDS_MSG = "Missing Fields!";
 
@@ -24,4 +27,7 @@ public class Definitions {
 
     public static final int EMPTY_LIST = 610;
     public static final String EMPTY_LIST_MSG = "The list is empty!";
+
+    public static final int PRODUCT_NOT_EXISTS = 610;
+    public static final String PRODUCT_NOT_EXISTS_MSG = "The product is not exists!";
 }

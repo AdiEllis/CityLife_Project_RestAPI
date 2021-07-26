@@ -2,28 +2,19 @@ package com.project.Models;
 
 
 public class User extends BaseEntitie {
-
-    private String uid;
-    private String firstName;
-    private String lastName;
-    private String password;
     private String email;
+    private String password;
     private String phone;
     private String token;
-    private int permission;
-    private int department;
+    private String colonyID;
 
-    public User(String uid, String firstName, String lastName, String password, String email, String phone, String token, int permission, int department, boolean deleted) {
+    public User( String email, String password, String phone, String token, boolean deleted, String colonyID) {
         super(deleted);
-        this.uid = uid;
-        this.firstName = firstName;
-        this.lastName = lastName;
         this.password = password;
         this.email = email;
         this.phone = phone;
         this.token = token;
-        this.permission = permission;
-        this.department = department;
+        this.colonyID = colonyID;
 
     }
 
@@ -31,21 +22,18 @@ public class User extends BaseEntitie {
         super();
     }
 
-    public User(int id, String uid, String firstName, String lastName, String password, String email, String phone, String token, int permission, int department, boolean deleted) {
+    public User(int id, String email, String password, String phone, String token,String colonyID, boolean deleted) {
         super(id, deleted);
-        this.uid = uid;
-        this.firstName = firstName;
-        this.lastName = lastName;
         this.password = password;
         this.email = email;
         this.phone = phone;
         this.token = token;
-        this.permission = permission;
-        this.department = department;
+        this.colonyID = colonyID;
+
     }
 
     public boolean objectIsEmpty() {
-        if (isEmpty(this.uid) || isEmpty(this.firstName) || isEmpty(this.lastName) || isEmpty(this.password) || isEmpty(this.phone) || this.permission <= 0 || this.department <= 0) {
+        if (isEmpty(this.colonyID) || isEmpty(this.password) || isEmpty(this.phone)) {
             return true;
         }
         return false;
@@ -58,29 +46,6 @@ public class User extends BaseEntitie {
             return false;
     }
 
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
 
     public String getPassword() {
         return password;
@@ -106,27 +71,19 @@ public class User extends BaseEntitie {
         this.phone = phone;
     }
 
-    public int getPermission() {
-        return permission;
-    }
-
-    public void setPermission(int permission) {
-        this.permission = permission;
-    }
-
-    public int getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(int department) {
-        this.department = department;
-    }
-
     public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getColonyID() {
+        return colonyID;
+    }
+
+    public void setColonyID(String colonyID) {
+        this.colonyID = colonyID;
     }
 }

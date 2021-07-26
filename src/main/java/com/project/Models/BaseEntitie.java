@@ -5,11 +5,11 @@ import org.apache.commons.lang.ArrayUtils;
 import java.lang.reflect.Field;
 
 public abstract class BaseEntitie {
-    private int id;
+    private int oid;
     private boolean deleted;
 
-    public BaseEntitie(int id, boolean deleted) {
-        this.id = id;
+    public BaseEntitie(int oid, boolean deleted) {
+        this.oid = oid;
         this.deleted = deleted;
     }
 
@@ -28,12 +28,12 @@ public abstract class BaseEntitie {
         this.deleted = deleted;
     }
 
-    public int getId() {
-        return id;
+    public int getOid() {
+        return oid;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setOid(int oid) {
+        this.oid = oid;
     }
 
     public void setObject(Object other) {
