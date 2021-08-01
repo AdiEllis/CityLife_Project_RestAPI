@@ -42,7 +42,7 @@ public class ResidenceController {
                     .setParameter("oid", oid)
                     .list();
             if (residencesList.isEmpty()) {
-                basicResponseModel = new BasicResponseModel(Definitions.PRODUCT_NOT_EXISTS, Definitions.PRODUCT_NOT_EXISTS_MSG);
+                basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
             } else if (residencesList.size() > 1) {
                 basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
             } else {
@@ -65,6 +65,7 @@ public class ResidenceController {
         return basicResponseModel;
     }
 
+
     @RequestMapping(value = "/residence/getResidence", method = RequestMethod.GET)
     public BasicResponseModel getResidence(@RequestParam int oid) {
         BasicResponseModel basicResponseModel;
@@ -75,7 +76,7 @@ public class ResidenceController {
                     .setParameter("oid", oid)
                     .list();
             if (residencesList.isEmpty()) {
-                basicResponseModel = new BasicResponseModel(Definitions.PRODUCT_NOT_EXISTS, Definitions.PRODUCT_NOT_EXISTS_MSG);
+                basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
             } else if (residencesList.size() > 1) {
                 basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
             } else {
@@ -98,7 +99,7 @@ public class ResidenceController {
                         .setParameter("oid", residence.getOid())
                         .list();
                 if (residencesList.isEmpty()) {
-                    basicResponseModel = new BasicResponseModel(Definitions.PRODUCT_NOT_EXISTS, Definitions.PRODUCT_NOT_EXISTS_MSG);
+                    basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
                 } else if (residencesList.size() > 1) {
                     basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
                 } else {

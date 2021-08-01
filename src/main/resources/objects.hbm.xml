@@ -27,5 +27,12 @@
         <property name="colonyID" column="colonyID" type="string"/>
         <property name="deleted" column="deleted" type="boolean"/>
     </class>
-
+    <class name="com.project.Models.Colony" table="colonies">
+        <id name="oid" type="int" column="oid">
+            <generator class="native"/>
+        </id>
+        <property name="enColonyName" column="enColonyName" type="string"/>
+        <property name="heColonyName" column="heColonyName" type="string"/>
+        <property name="deleted" column="deleted" type="boolean"/>
+    </class>
 </hibernate-mapping>

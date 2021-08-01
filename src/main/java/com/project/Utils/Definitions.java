@@ -28,6 +28,6 @@ public class Definitions {
     public static final int EMPTY_LIST = 610;
     public static final String EMPTY_LIST_MSG = "The list is empty!";
 
-    public static final int PRODUCT_NOT_EXISTS = 610;
-    public static final String PRODUCT_NOT_EXISTS_MSG = "The product is not exists!";
+    public static final int ARGUMENT_NOT_EXISTS = 610;
+    public static final String ARGUMENT_NOT_EXISTS_MSG = "The argument is not exists!";
 }
