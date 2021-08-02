@@ -45,4 +45,12 @@
         <property name="colonyId" column="colonyId" type="int"/>
         <property name="deleted" column="deleted" type="boolean"/>
     </class>
+    <class name="com.project.Models.Street" table="streets">
+        <id name="oid" type="int" column="oid">
+            <generator class="native"/>
+        </id>
+        <property name="name" column="name" type="string"/>
+        <property name="colonyId" column="colonyId" type="int"/>
+        <property name="deleted" column="deleted" type="boolean"/>
+    </class>
 </hibernate-mapping>
