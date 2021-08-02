@@ -23,7 +23,7 @@ public class ColoniesController {
     }
 
     @RequestMapping(value = "/colony/add", method = RequestMethod.POST)
-    public Colony addResidence(@RequestParam String enColonyName, @RequestParam String heColonyName) {
+    public Colony addColony(@RequestParam String enColonyName, @RequestParam String heColonyName) {
         Colony colonyToAdd = new Colony(enColonyName, heColonyName, false);
         persist.save(colonyToAdd);
         return colonyToAdd;

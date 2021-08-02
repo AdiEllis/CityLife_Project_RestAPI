@@ -4,6 +4,9 @@ public class Definitions {
     public static final int INVALID_ARGUMENT = 1000;
     public static final String INVALID_ARGUMENT_MSG = "Invalid Argument.";
 
+    public static final int COLONY_NOT_EXISTS = 200;
+    public static final String COLONY_NOT_EXISTS_MSG = "colony not exists.";
+
     public static final int MISSING_FIELDS = 500;
     public static final String MISSING_FIELDS_MSG = "Missing Fields!";
 
