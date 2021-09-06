@@ -33,4 +33,10 @@ public class Definitions {
 
     public static final int ARGUMENT_NOT_EXISTS = 610;
     public static final String ARGUMENT_NOT_EXISTS_MSG = "The argument is not exists!";
+
+    public static final int NO_PERMISSIONS = 998;
+    public static final String NO_PERMISSIONS_MSG = "אין הרשאה.";
+
+    public static final int INVALID_TOKEN = 999;
+    public static final String INVALID_TOKEN_MSG = "אירעה שגיאה, אנא התחבר מחדש.";
 }
