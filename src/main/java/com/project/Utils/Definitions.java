@@ -39,4 +39,7 @@ public class Definitions {
 
     public static final int INVALID_TOKEN = 999;
     public static final String INVALID_TOKEN_MSG = "אירעה שגיאה, אנא התחבר מחדש.";
+
+    public static final int INVALID_DATE = 350;
+    public static final String INVALID_DATE_MSG = "אנא הכנס תאריך תקין";
 }

@@ -4,7 +4,9 @@ import com.project.Models.Residence;
 import com.project.Objects.Entities.AuthUser;
 import com.project.Objects.Entities.BasicResponseModel;
 import com.project.Persist;
+import com.project.Utils.DateValidator;
 import com.project.Utils.Definitions;
+import org.apache.commons.validator.GenericValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 
 import java.util.List;
+
+import static org.apache.commons.validator.GenericValidator.isDate;
 /**/
 
 @RestController
@@ -19,6 +23,8 @@ import java.util.List;
 public class ResidenceController extends BaseController {
     @Autowired
     private Persist persist;
+    @Autowired
+    private DateValidator dateValidator;
 
     @PostConstruct
     public void init() {
@@ -31,9 +37,13 @@ public class ResidenceController extends BaseController {
                                            AuthUser authUser) {
         BasicResponseModel basicResponseModel;
         if (authUser.getAuthUserError() == null) {
-            Residence residenceToAdd = new Residence(firstName, lastName, birthDate, phone, id, colonyID, streetID, houseNumber, false);
-            persist.save(residenceToAdd);
-            basicResponseModel = new BasicResponseModel(residenceToAdd);
+            if (!dateValidator.isValid(birthDate)) {
+                basicResponseModel = new BasicResponseModel(Definitions.INVALID_DATE, Definitions.INVALID_DATE_MSG);
+            } else {
+                Residence residenceToAdd = new Residence(firstName, lastName, birthDate, phone, id, colonyID, streetID, houseNumber, false);
+                persist.save(residenceToAdd);
+                basicResponseModel = new BasicResponseModel(residenceToAdd);
+            }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
         } else {
@@ -134,10 +144,14 @@ public class ResidenceController extends BaseController {
                     } else if (residencesList.size() > 1) {
                         basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
                     } else {
-                        Residence oldResidence = persist.loadObject(Residence.class, residence.getOid());
-                        oldResidence.setObject(residence);
-                        persist.save(oldResidence);
-                        basicResponseModel = new BasicResponseModel(residencesList);
+                        if (!dateValidator.isValid(residence.getBirthDate())) {
+                            basicResponseModel = new BasicResponseModel(Definitions.INVALID_DATE, Definitions.INVALID_DATE_MSG);
+                        } else {
+                            Residence oldResidence = persist.loadObject(Residence.class, residence.getOid());
+                            oldResidence.setObject(residence);
+                            persist.save(oldResidence);
+                            basicResponseModel = new BasicResponseModel(residencesList);
+                        }
                     }
                 }
             }
