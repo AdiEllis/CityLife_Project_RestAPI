@@ -1,5 +1,6 @@
 package com.project.Utils;
 
+import com.beust.jcommander.internal.Console;
 import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
@@ -10,9 +11,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 @Component
-public class DateValidator {
+public class DateUtils {
 
-    public boolean isValid(String dateStr) {
+    public boolean isValidDatePattern(String dateStr) {
         DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
         try {
@@ -21,5 +22,14 @@ public class DateValidator {
             return false;
         }
         return true;
+    }
+    public String convertDate2TS(String dateStr) {
+        DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        sdf.setLenient(false);
+        try {
+            return String.valueOf(sdf.parse(dateStr).getTime());
+        } catch (ParseException e) {
+            return null;
+        }
     }
 }

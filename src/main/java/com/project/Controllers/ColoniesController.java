@@ -1,39 +1,51 @@
 package com.project.Controllers;
 
 import com.project.Models.Colony;
-import com.project.Models.Residence;
 import com.project.Objects.Entities.AuthUser;
 import com.project.Objects.Entities.BasicResponseModel;
 import com.project.Persist;
 import com.project.Utils.Definitions;
+import com.project.Utils.IdValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RestController
 @Transactional
 public class ColoniesController extends BaseController {
     @Autowired
     private Persist persist;
+    @Autowired
+    private IdValidator idValidator;
 
     @PostConstruct
     public void init() {
     }
 
     @RequestMapping(value = "/colony/add", method = RequestMethod.POST)
-    public BasicResponseModel addColony(
-            @RequestParam String enColonyName,
-            @RequestParam String heColonyName,
-            AuthUser authUser
+    public BasicResponseModel addColony(@ModelAttribute("Colony") Colony colony,
+                                        AuthUser authUser
     ) {
         BasicResponseModel basicResponseModel;
         if (authUser.getAuthUserError() == null) {
-            Colony colonyToAdd = new Colony(enColonyName, heColonyName, false);
-            persist.save(colonyToAdd);
-            basicResponseModel = new BasicResponseModel(colonyToAdd);
+            if (colony.objectIsEmpty()) {
+                basicResponseModel = new BasicResponseModel(Definitions.MISSING_FIELDS, Definitions.MISSING_FIELDS_MSG);
+            } else {
+                if (!Pattern.matches("[א-ת]+", colony.getHeColonyName())) {
+                    basicResponseModel = new BasicResponseModel(Definitions.INVALID_HEBREW_NAME, Definitions.INVALID_HEBREW_NAME_MSG);
+                } else {
+                    if (!Pattern.matches("[a-zA-Z]+", colony.getEnColonyName())) {
+                        basicResponseModel = new BasicResponseModel(Definitions.INVALID_ENGLISH_NAME, Definitions.INVALID_ENGLISH_NAME_MSG);
+                    } else {
+                        persist.save(colony);
+                        basicResponseModel = new BasicResponseModel(colony);
+                    }
+                }
+            }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
         } else {
@@ -51,22 +63,17 @@ public class ColoniesController extends BaseController {
     ) {
         BasicResponseModel basicResponseModel;
         if (authUser.getAuthUserError() == null) {
-            if (id < 1) {
-                basicResponseModel = new BasicResponseModel(Definitions.INVALID_ARGUMENT, Definitions.INVALID_ARGUMENT_MSG);
+            BasicResponseModel isValidId = idValidator.isValidId(id, Colony.class);
+            if (isValidId != null) {
+                basicResponseModel = isValidId;
             } else {
                 List<Colony> coloniesList = persist.getQuerySession().createQuery("FROM Colony WHERE id = :id")
                         .setParameter("id", id)
                         .list();
-                if (coloniesList.isEmpty()) {
-                    basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
-                } else if (coloniesList.size() > 1) {
-                    basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
-                } else {
-                    Colony colony = coloniesList.get(0);
-                    colony.setDeleted(delete);
-                    persist.save(colony);
-                    basicResponseModel = new BasicResponseModel(colony);
-                }
+                Colony colony = coloniesList.get(0);
+                colony.setDeleted(delete);
+                persist.save(colony);
+                basicResponseModel = new BasicResponseModel(colony);
             }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
@@ -93,20 +100,16 @@ public class ColoniesController extends BaseController {
     @RequestMapping(value = "/colony/getColony", method = RequestMethod.POST)
     public BasicResponseModel getColony(@RequestParam int id, AuthUser authUser) {
         BasicResponseModel basicResponseModel;
+        BasicResponseModel isValidId = idValidator.isValidId(id, Colony.class);
         if (authUser.getAuthUserError() == null) {
-            if (id < 1) {
-                basicResponseModel = new BasicResponseModel(Definitions.INVALID_ARGUMENT, Definitions.INVALID_ARGUMENT_MSG);
+            if (isValidId != null) {
+                basicResponseModel = isValidId;
             } else {
                 List<Colony> coloniesList = persist.getQuerySession().createQuery("FROM Colony WHERE id = :id")
                         .setParameter("id", id)
                         .list();
-                if (coloniesList.isEmpty()) {
-                    basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
-                } else if (coloniesList.size() > 1) {
-                    basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
-                } else {
-                    basicResponseModel = new BasicResponseModel(coloniesList.get(0));
-                }
+                basicResponseModel = new BasicResponseModel(coloniesList.get(0));
+
             }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
@@ -120,27 +123,18 @@ public class ColoniesController extends BaseController {
     public BasicResponseModel updateColony(@ModelAttribute("Colony") Colony colony,
                                            AuthUser authUser) {
         BasicResponseModel basicResponseModel;
+        BasicResponseModel isValidId = idValidator.isValidId(colony.getOid(), Colony.class);
         if (authUser.getAuthUserError() == null) {
-            if (colony.getOid() < 1) {
-                basicResponseModel = new BasicResponseModel(Definitions.INVALID_ARGUMENT, Definitions.INVALID_ARGUMENT_MSG);
+            if (isValidId != null) {
+                basicResponseModel = isValidId;
             } else {
-                if (colony.objectIsEmpty()) {
-                    basicResponseModel = new BasicResponseModel(Definitions.MISSING_FIELDS, Definitions.MISSING_FIELDS_MSG);
-                } else {
-                    List<Colony> coloniesList = persist.getQuerySession().createQuery("FROM Colony WHERE id = :id")
-                            .setParameter("id", colony.getOid())
-                            .list();
-                    if (coloniesList.isEmpty()) {
-                        basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
-                    } else if (coloniesList.size() > 1) {
-                        basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
-                    } else {
-                        Colony oldColony = persist.loadObject(Colony.class, colony.getOid());
-                        oldColony.setObject(colony);
-                        persist.save(oldColony);
-                        basicResponseModel = new BasicResponseModel(coloniesList);
-                    }
-                }
+                List<Colony> coloniesList = persist.getQuerySession().createQuery("FROM Colony WHERE id = :id")
+                        .setParameter("id", colony.getOid())
+                        .list();
+                Colony oldColony = persist.loadObject(Colony.class, colony.getOid());
+                oldColony.setObject(colony);
+                persist.save(oldColony);
+                basicResponseModel = new BasicResponseModel(coloniesList);
             }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);

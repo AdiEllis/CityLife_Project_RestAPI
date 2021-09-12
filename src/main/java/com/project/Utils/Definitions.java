@@ -42,4 +42,12 @@ public class Definitions {
 
     public static final int INVALID_DATE = 350;
     public static final String INVALID_DATE_MSG = "אנא הכנס תאריך תקין";
+
+    public static final int INVALID_HEBREW_NAME = 900;
+    public static final String INVALID_HEBREW_NAME_MSG = "אנא הכנס תווים בעברית";
+
+    public static final int INVALID_ENGLISH_NAME = 901;
+    public static final String INVALID_ENGLISH_NAME_MSG = "אנא הכנס תווים באנגלית";
+
+
 }

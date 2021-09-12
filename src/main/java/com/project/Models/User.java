@@ -6,9 +6,9 @@ public class User extends BaseEntitie {
     private String password;
     private String phone;
     private String token;
-    private String colonyID;
+    private int colonyID;
 
-    public User( String email, String password, String phone, String token, boolean deleted, String colonyID) {
+    public User( String email, String password, String phone, String token, boolean deleted, int colonyID) {
         super(deleted);
         this.password = password;
         this.email = email;
@@ -22,7 +22,7 @@ public class User extends BaseEntitie {
         super();
     }
 
-    public User(int id, String email, String password, String phone, String token,String colonyID, boolean deleted) {
+    public User(int id, String email, String password, String phone, String token,int colonyID, boolean deleted) {
         super(id, deleted);
         this.password = password;
         this.email = email;
@@ -31,9 +31,9 @@ public class User extends BaseEntitie {
         this.colonyID = colonyID;
 
     }
-
+    //TODO check if colonyID is > 0
     public boolean objectIsEmpty() {
-        if (isEmpty(this.colonyID) || isEmpty(this.password) || isEmpty(this.phone)) {
+        if (/*isEmpty(this.colonyID) ||*/ isEmpty(this.password) || isEmpty(this.phone)) {
             return true;
         }
         return false;
@@ -79,11 +79,11 @@ public class User extends BaseEntitie {
         this.token = token;
     }
 
-    public String getColonyID() {
+    public int getColonyID() {
         return colonyID;
     }
 
-    public void setColonyID(String colonyID) {
+    public void setColonyID(int colonyID) {
         this.colonyID = colonyID;
     }
 }

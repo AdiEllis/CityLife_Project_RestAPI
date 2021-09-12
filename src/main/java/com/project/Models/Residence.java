@@ -6,12 +6,12 @@ public class Residence extends BaseEntitie {
     private String birthDate;
     private String phone;
     private String id;
-    private String colonyID;
-    private String streetID;
+    private int colonyID;
+    private int streetID;
     private String houseNumber;
 
     public Residence() {}
-    public Residence(int oid, boolean deleted, String firstName, String lastName, String birthDate, String phone, String id, String colonyID, String streetID, String houseNumber) {
+    public Residence(int oid, boolean deleted, String firstName, String lastName, String birthDate, String phone, String id, int colonyID, int streetID, String houseNumber) {
         super(oid, deleted);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -23,7 +23,7 @@ public class Residence extends BaseEntitie {
         this.houseNumber = houseNumber;
     }
 
-    public Residence(String firstName, String lastName, String birthDate, String phone, String id,String colonyID, String streetID, String houseNumber, boolean deleted) {
+    public Residence(String firstName, String lastName, String birthDate, String phone, String id,int colonyID, int streetID, String houseNumber, boolean deleted) {
         super(deleted);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -35,7 +35,8 @@ public class Residence extends BaseEntitie {
         this.houseNumber = houseNumber;
     }
     public boolean objectIsEmpty() {
-        if (isEmpty(this.firstName) ||  isEmpty(this.lastName) || isEmpty(this.birthDate) || isEmpty(this.phone) || isEmpty(this.id)) {
+        //TODO make id > 0
+        if (isEmpty(this.firstName) ||  isEmpty(this.lastName) || isEmpty(this.birthDate) || isEmpty(this.phone) /*|| isEmpty(this.id)*/) {
             return true;
         }
         return false;
@@ -48,19 +49,19 @@ public class Residence extends BaseEntitie {
             return false;
     }
 
-    public String getColonyID() {
+    public int getColonyID() {
         return colonyID;
     }
 
-    public void setColonyID(String colonyID) {
+    public void setColonyID(int colonyID) {
         this.colonyID = colonyID;
     }
 
-    public String getStreetID() {
+    public int getStreetID() {
         return streetID;
     }
 
-    public void setStreetID(String streetID) {
+    public void setStreetID(int streetID) {
         this.streetID = streetID;
     }
 

@@ -1,12 +1,14 @@
 package com.project.Controllers;
 
+import com.project.Models.Colony;
 import com.project.Models.Residence;
+import com.project.Models.Street;
 import com.project.Objects.Entities.AuthUser;
 import com.project.Objects.Entities.BasicResponseModel;
 import com.project.Persist;
-import com.project.Utils.DateValidator;
+import com.project.Utils.DateUtils;
 import com.project.Utils.Definitions;
-import org.apache.commons.validator.GenericValidator;
+import com.project.Utils.IdValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +17,6 @@ import javax.annotation.PostConstruct;
 
 import java.util.List;
 
-import static org.apache.commons.validator.GenericValidator.isDate;
-/**/
 
 @RestController
 @Transactional
@@ -24,32 +24,47 @@ public class ResidenceController extends BaseController {
     @Autowired
     private Persist persist;
     @Autowired
-    private DateValidator dateValidator;
+    private DateUtils dateUtils;
+    @Autowired
+    private IdValidator idValidator;
 
     @PostConstruct
     public void init() {
     }
 
     @RequestMapping(value = "/residence/add", method = RequestMethod.POST)
-    public BasicResponseModel addResidence(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String birthDate,
-                                           @RequestParam String phone, @RequestParam String id, @RequestParam String colonyID,
-                                           @RequestParam String streetID, @RequestParam String houseNumber,
-                                           AuthUser authUser) {
-        BasicResponseModel basicResponseModel;
+    public BasicResponseModel addResidence(
+            @ModelAttribute("Residence") Residence residence,
+            AuthUser authUser
+    ) {
+        BasicResponseModel basicResponseModel = null;
         if (authUser.getAuthUserError() == null) {
-            if (!dateValidator.isValid(birthDate)) {
-                basicResponseModel = new BasicResponseModel(Definitions.INVALID_DATE, Definitions.INVALID_DATE_MSG);
+            if (residence.objectIsEmpty()) {
+                basicResponseModel = new BasicResponseModel(Definitions.MISSING_FIELDS, Definitions.MISSING_FIELDS_MSG);
             } else {
-                Residence residenceToAdd = new Residence(firstName, lastName, birthDate, phone, id, colonyID, streetID, houseNumber, false);
-                persist.save(residenceToAdd);
-                basicResponseModel = new BasicResponseModel(residenceToAdd);
+                BasicResponseModel isValidStreetId = idValidator.isValidId(residence.getStreetID(), Street.class);
+                BasicResponseModel isValidColonyId = idValidator.isValidId(residence.getColonyID(), Colony.class);
+                if (isValidColonyId != null) {
+                    basicResponseModel = isValidColonyId;
+                } else {
+                    if (isValidStreetId != null) {
+                        basicResponseModel = isValidStreetId;
+                    } else {
+                        if (!dateUtils.isValidDatePattern(residence.getBirthDate())) {
+                            basicResponseModel = new BasicResponseModel(Definitions.INVALID_DATE, Definitions.INVALID_DATE_MSG);
+                        } else {
+                            residence.setBirthDate(dateUtils.convertDate2TS(residence.getBirthDate()));
+                            persist.save(residence);
+                            basicResponseModel = new BasicResponseModel(residence);
+                        }
+                    }
+                }
             }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
         } else {
             basicResponseModel = new BasicResponseModel(Definitions.NO_PERMISSIONS, Definitions.NO_PERMISSIONS_MSG);
         }
-
         return basicResponseModel;
     }
 
@@ -57,23 +72,18 @@ public class ResidenceController extends BaseController {
     public BasicResponseModel deleteResidence(@RequestParam int oid, @RequestParam boolean delete,
                                               AuthUser authUser) {
         BasicResponseModel basicResponseModel;
+        BasicResponseModel isValidOid = idValidator.isValidId(oid, Residence.class);
         if (authUser.getAuthUserError() == null) {
-            if (oid < 1) {
-                basicResponseModel = new BasicResponseModel(Definitions.INVALID_ARGUMENT, Definitions.INVALID_ARGUMENT_MSG);
+            if (isValidOid != null) {
+                basicResponseModel = isValidOid;
             } else {
                 List<Residence> residencesList = persist.getQuerySession().createQuery("FROM Residence WHERE oid = :oid")
                         .setParameter("oid", oid)
                         .list();
-                if (residencesList.isEmpty()) {
-                    basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
-                } else if (residencesList.size() > 1) {
-                    basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
-                } else {
-                    Residence residence = residencesList.get(0);
-                    residence.setDeleted(delete);
-                    persist.save(residence);
-                    basicResponseModel = new BasicResponseModel(residence);
-                }
+                Residence residence = residencesList.get(0);
+                residence.setDeleted(delete);
+                persist.save(residence);
+                basicResponseModel = new BasicResponseModel(residence);
             }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
@@ -102,20 +112,15 @@ public class ResidenceController extends BaseController {
     @RequestMapping(value = "/residence/getResidence", method = RequestMethod.GET)
     public BasicResponseModel getResidence(@RequestParam int oid, AuthUser authUser) {
         BasicResponseModel basicResponseModel;
+        BasicResponseModel isValidId = idValidator.isValidId(oid, Residence.class);
         if (authUser.getAuthUserError() == null) {
-            if (oid < 1) {
-                basicResponseModel = new BasicResponseModel(Definitions.INVALID_ARGUMENT, Definitions.INVALID_ARGUMENT_MSG);
+            if (isValidId != null) {
+                basicResponseModel = isValidId;
             } else {
                 List<Residence> residencesList = persist.getQuerySession().createQuery("FROM Residence WHERE oid = :oid")
                         .setParameter("oid", oid)
                         .list();
-                if (residencesList.isEmpty()) {
-                    basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
-                } else if (residencesList.size() > 1) {
-                    basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
-                } else {
-                    basicResponseModel = new BasicResponseModel(residencesList);
-                }
+                basicResponseModel = new BasicResponseModel(residencesList);
             }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
@@ -126,31 +131,39 @@ public class ResidenceController extends BaseController {
     }
 
     @RequestMapping(value = "/residence/update", method = RequestMethod.POST)
-    public BasicResponseModel updateResidence(@ModelAttribute("Residence") Residence residence,
-                                              AuthUser authUser) {
+    public BasicResponseModel updateResidence(
+            @ModelAttribute("Residence") Residence residence,
+            AuthUser authUser
+    ) {
         BasicResponseModel basicResponseModel;
+        BasicResponseModel isValidId = idValidator.isValidId(residence.getOid(), Residence.class);
+        BasicResponseModel isValidStreetId = idValidator.isValidId(residence.getStreetID(), Street.class);
+        BasicResponseModel isValidColonyId = idValidator.isValidId(residence.getColonyID(), Colony.class);
         if (authUser.getAuthUserError() == null) {
-            if (residence.getOid() < 1) {
-                basicResponseModel = new BasicResponseModel(Definitions.INVALID_ARGUMENT, Definitions.INVALID_ARGUMENT_MSG);
+            if (residence.objectIsEmpty()) {
+                basicResponseModel = new BasicResponseModel(Definitions.MISSING_FIELDS, Definitions.MISSING_FIELDS_MSG);
             } else {
-                if (residence.objectIsEmpty()) {
-                    basicResponseModel = new BasicResponseModel(Definitions.MISSING_FIELDS, Definitions.MISSING_FIELDS_MSG);
+                if (isValidId != null) {
+                    basicResponseModel = isValidId;
                 } else {
-                    List<Residence> residencesList = persist.getQuerySession().createQuery("FROM Residence WHERE oid = :oid")
-                            .setParameter("oid", residence.getOid())
-                            .list();
-                    if (residencesList.isEmpty()) {
-                        basicResponseModel = new BasicResponseModel(Definitions.ARGUMENT_NOT_EXISTS, Definitions.ARGUMENT_NOT_EXISTS_MSG);
-                    } else if (residencesList.size() > 1) {
-                        basicResponseModel = new BasicResponseModel(Definitions.MULTI_RECORD, Definitions.MULTI_RECORD_MSG);
+                    if (isValidColonyId != null) {
+                        basicResponseModel = isValidColonyId;
                     } else {
-                        if (!dateValidator.isValid(residence.getBirthDate())) {
-                            basicResponseModel = new BasicResponseModel(Definitions.INVALID_DATE, Definitions.INVALID_DATE_MSG);
+                        if (isValidStreetId != null) {
+                            basicResponseModel = isValidStreetId;
                         } else {
-                            Residence oldResidence = persist.loadObject(Residence.class, residence.getOid());
-                            oldResidence.setObject(residence);
-                            persist.save(oldResidence);
-                            basicResponseModel = new BasicResponseModel(residencesList);
+                            if (!dateUtils.isValidDatePattern(residence.getBirthDate())) {
+                                basicResponseModel = new BasicResponseModel(Definitions.INVALID_DATE, Definitions.INVALID_DATE_MSG);
+                            } else {
+                                List<Residence> residencesList = persist.getQuerySession().createQuery("FROM Residence WHERE oid = :oid")
+                                        .setParameter("oid", residence.getOid())
+                                        .list();
+                                Residence oldResidence = persist.loadObject(Residence.class, residence.getOid());
+                                residence.setBirthDate(dateUtils.convertDate2TS(residence.getBirthDate()));
+                                oldResidence.setObject(residence);
+                                persist.save(oldResidence);
+                                basicResponseModel = new BasicResponseModel(residencesList);
+                            }
                         }
                     }
                 }

@@ -11,11 +11,14 @@
         <property name="birthDate" column="birthDate" type="string"/>
         <property name="phone" column="phone" type="string"/>
         <property name="id" column="id" type="string"/>
-        <property name="colonyID" column="colonyID" type="string"/>
-        <property name="streetID" column="streetID" type="string"/>
+        <property name="colonyID" column="colonyID" type="int"/>
+        <property name="streetID" column="streetID" type="int"/>
         <property name="houseNumber" column="houseNumber" type="string"/>
-        <property name="deleted" column="deleted" type="boolean"/>
+        <property name="deleted" type="boolean">
+            <column name="deleted" default="false" />
+        </property>
     </class>
+
     <class name="com.project.Models.User" table="Users">
         <id name="oid" type="int" column="oid">
             <generator class="native"/>
@@ -24,8 +27,10 @@
         <property name="password" column="password" type="string"/>
         <property name="phone" column="phone" type="string"/>
         <property name="token" column="token" type="string"/>
-        <property name="colonyID" column="colonyID" type="string"/>
-        <property name="deleted" column="deleted" type="boolean"/>
+        <property name="colonyID" column="colonyID" type="int"/>
+        <property name="deleted" type="boolean">
+            <column name="deleted" default="false" />
+        </property>
     </class>
     <class name="com.project.Models.Colony" table="colonies">
         <id name="oid" type="int" column="oid">
@@ -33,7 +38,9 @@
         </id>
         <property name="enColonyName" column="enColonyName" type="string"/>
         <property name="heColonyName" column="heColonyName" type="string"/>
-        <property name="deleted" column="deleted" type="boolean"/>
+        <property name="deleted" type="boolean">
+            <column name="deleted" default="false" />
+        </property>
     </class>
     <class name="com.project.Models.Transaction" table="transactions">
         <id name="oid" type="int" column="oid">
@@ -43,14 +50,19 @@
         <property name="typeAction" column="typeAction" type="string"/>
         <property name="descriptionAction" column="descriptionAction" type="string"/>
         <property name="colonyID" column="colonyId" type="int"/>
-        <property name="deleted" column="deleted" type="boolean"/>
+        <property name="deleted" type="boolean">
+            <column name="deleted" default="false" />
+        </property>
     </class>
+
     <class name="com.project.Models.Street" table="streets">
         <id name="oid" type="int" column="oid">
             <generator class="native"/>
         </id>
         <property name="name" column="name" type="string"/>
         <property name="colonyID" column="colonyId" type="int"/>
-        <property name="deleted" column="deleted" type="boolean"/>
+        <property name="deleted" type="boolean">
+            <column name="deleted" default="false" />
+        </property>
     </class>
 </hibernate-mapping>
