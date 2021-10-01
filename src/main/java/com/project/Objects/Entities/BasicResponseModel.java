@@ -5,10 +5,13 @@ public class BasicResponseModel {
     private String errorName;
     private String customMessage;
     private Object object;
+    private AuthUser authUser;
+
     public BasicResponseModel(int errorCode, String errorName) {
         this.errorCode = errorCode;
         this.errorName = errorName;
     }
+
     public BasicResponseModel(Object object) {
         this.object = object;
     }
@@ -47,5 +50,13 @@ public class BasicResponseModel {
 
     public void setObject(Object object) {
         this.object = object;
+    }
+
+    public AuthUser getAuthUser() {
+        return authUser;
+    }
+
+    public void setAuthUser(AuthUser authUser) {
+        this.authUser = authUser;
     }
 }

@@ -7,6 +7,7 @@ public class User extends BaseEntitie {
     private String phone;
     private String token;
     private int colonyID;
+    private String colonyName;
 
     public User( String email, String password, String phone, String token, boolean deleted, int colonyID) {
         super(deleted);
@@ -85,5 +86,13 @@ public class User extends BaseEntitie {
 
     public void setColonyID(int colonyID) {
         this.colonyID = colonyID;
+    }
+
+    public String getColonyName() {
+        return colonyName;
+    }
+
+    public void setColonyName(String colonyName) {
+        this.colonyName = colonyName;
     }
 }

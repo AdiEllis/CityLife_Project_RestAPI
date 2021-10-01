@@ -3,6 +3,7 @@ package com.project.Models;
 public class Street extends BaseEntitie {
     private String name;
     private int colonyID;
+    private String colonyName;
 
     public Street() {}
     public Street(int oid, boolean deleted, String name, int colonyID) {
@@ -43,5 +44,13 @@ public class Street extends BaseEntitie {
 
     public void setColonyID(int colonyID) {
         this.colonyID = colonyID;
+    }
+
+    public String getColonyName() {
+        return colonyName;
+    }
+
+    public void setColonyName(String colonyName) {
+        this.colonyName = colonyName;
     }
 }

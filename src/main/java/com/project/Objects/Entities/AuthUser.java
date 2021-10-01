@@ -4,9 +4,11 @@ public class AuthUser {
     private int authUserId;
     private String authUserEmail;
     private Integer authUserError;
+    private String authUserToken;
 
-    public AuthUser(int authUserId, String authUserEmail) {
+    public AuthUser(int authUserId, String authUserToken, String authUserEmail) {
         this.authUserId = authUserId;
+        this.authUserToken = authUserToken;
         this.authUserEmail = authUserEmail;
     }
 
@@ -38,12 +40,21 @@ public class AuthUser {
         this.authUserError = authUserError;
     }
 
+    public String getAuthUserToken() {
+        return authUserToken;
+    }
+
+    public void setAuthUserToken(String authUserToken) {
+        this.authUserToken = authUserToken;
+    }
+
     @Override
     public String toString() {
         return "AuthUser{" +
                 "authUserId=" + authUserId +
                 ", authUserEmail='" + authUserEmail + '\'' +
                 ", authUserError=" + authUserError +
+                ", authUserToken='" + authUserToken + '\'' +
                 '}';
     }
 }

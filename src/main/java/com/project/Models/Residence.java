@@ -7,7 +7,9 @@ public class Residence extends BaseEntitie {
     private String phone;
     private String id;
     private int colonyID;
+    private String colonyName;
     private int streetID;
+    private String streetName;
     private String houseNumber;
 
     public Residence() {}
@@ -111,5 +113,21 @@ public class Residence extends BaseEntitie {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getColonyName() {
+        return colonyName;
+    }
+
+    public void setColonyName(String colonyName) {
+        this.colonyName = colonyName;
+    }
+
+    public String getStreetName() {
+        return streetName;
+    }
+
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
     }
 }

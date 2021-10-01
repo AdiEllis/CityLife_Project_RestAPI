@@ -26,7 +26,11 @@ public class BaseController {
                     .setParameter("token", token)
                     .uniqueResult();
             if(user != null){
-                authUser = new AuthUser(user.getOid(), user.getEmail());
+                authUser = new AuthUser(
+                        user.getOid(),
+                        user.getToken(),
+                        user.getEmail()
+                );
             }else{ //invalid token
                 authUser = new AuthUser(Definitions.INVALID_TOKEN);
             }

@@ -3,6 +3,7 @@ package com.project.Controllers;
 import com.project.Models.Colony;
 import com.project.Models.Residence;
 import com.project.Models.Street;
+import com.project.Models.User;
 import com.project.Objects.Entities.AuthUser;
 import com.project.Objects.Entities.BasicResponseModel;
 import com.project.Persist;
@@ -42,11 +43,11 @@ public class ResidenceController extends BaseController {
             if (residence.objectIsEmpty()) {
                 basicResponseModel = new BasicResponseModel(Definitions.MISSING_FIELDS, Definitions.MISSING_FIELDS_MSG);
             } else {
-                BasicResponseModel isValidStreetId = idValidator.isValidId(residence.getStreetID(), Street.class);
                 BasicResponseModel isValidColonyId = idValidator.isValidId(residence.getColonyID(), Colony.class);
                 if (isValidColonyId != null) {
                     basicResponseModel = isValidColonyId;
                 } else {
+                    BasicResponseModel isValidStreetId = idValidator.isValidId(residence.getStreetID(), Street.class);
                     if (isValidStreetId != null) {
                         basicResponseModel = isValidStreetId;
                     } else {
@@ -95,11 +96,21 @@ public class ResidenceController extends BaseController {
 
     @RequestMapping(value = "/residence/getAll", method = RequestMethod.GET)
     public BasicResponseModel getAllResidences(AuthUser authUser) {
-        BasicResponseModel basicResponseModel;
+        BasicResponseModel basicResponseModel =  null;
+
         if (authUser.getAuthUserError() == null) {
-            List<Residence> residencesList = persist.getQuerySession().createQuery("FROM Residence")
-                    .list();
-            basicResponseModel = new BasicResponseModel(residencesList);
+            List<Residence> residenceList = persist.getQuerySession().createQuery("FROM Residence").list();
+            for (int i = 0; i < residenceList.size(); i++) {
+                Colony colonyRow = persist.loadObject(Colony.class, residenceList.get(i).getColonyID());
+                Street streetRow = persist.loadObject(Street.class, residenceList.get(i).getStreetID());
+                residenceList.get(i).setColonyName(colonyRow.getHeColonyName());
+                residenceList.get(i).setStreetName(streetRow.getName());
+            }
+            if (residenceList.isEmpty()) {
+                basicResponseModel = new BasicResponseModel(Definitions.EMPTY_LIST, Definitions.EMPTY_LIST_MSG);
+            } else {
+                basicResponseModel = new BasicResponseModel(residenceList);
+            }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
         } else {

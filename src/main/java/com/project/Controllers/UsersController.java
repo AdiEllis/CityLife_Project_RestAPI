@@ -1,5 +1,7 @@
 package com.project.Controllers;
 
+import com.project.Models.Colony;
+import com.project.Models.Street;
 import com.project.Models.User;
 import com.project.Objects.Entities.AuthUser;
 import com.project.Objects.Entities.BasicResponseModel;
@@ -202,6 +204,10 @@ public class UsersController extends BaseController implements Validator {
         BasicResponseModel responseModel;
         if (authUser.getAuthUserError() == null) {
             List<User> allUsers = persist.getQuerySession().createQuery("FROM User").list();
+            for (int i = 0; i < allUsers.size(); i++) {
+                Colony colonyRow = persist.loadObject(Colony.class, allUsers.get(i).getColonyID());
+                allUsers.get(i).setColonyName(colonyRow.getHeColonyName());
+            }
             if (allUsers.isEmpty()) {
                 responseModel = new BasicResponseModel(Definitions.EMPTY_LIST, Definitions.EMPTY_LIST_MSG);
             } else {

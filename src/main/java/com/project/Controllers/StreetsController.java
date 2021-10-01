@@ -82,6 +82,12 @@ public class StreetsController extends BaseController {
         if (authUser.getAuthUserError() == null) {
             List<Street> allStreets = persist.getQuerySession().createQuery("FROM Street").list();
             basicResponseModel = new BasicResponseModel(allStreets);
+            for (int i = 0; i < allStreets.size(); i++) {
+                Colony colonyRow = persist.loadObject(Colony.class, allStreets.get(i).getColonyID());
+                allStreets.get(i).setColonyName(colonyRow.getHeColonyName());
+
+            }
+
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
         } else {
