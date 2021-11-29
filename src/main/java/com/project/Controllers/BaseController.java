@@ -29,7 +29,9 @@ public class BaseController {
                 authUser = new AuthUser(
                         user.getOid(),
                         user.getToken(),
-                        user.getEmail()
+                        user.getEmail(),
+                        user.getColonyID(),
+                        user.getIsAdmin()
                 );
             }else{ //invalid token
                 authUser = new AuthUser(Definitions.INVALID_TOKEN);

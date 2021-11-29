@@ -1,6 +1,7 @@
 package com.project.Controllers;
 
 import com.project.Models.Colony;
+import com.project.Models.Street;
 import com.project.Models.Transaction;
 import com.project.Objects.Entities.AuthUser;
 import com.project.Objects.Entities.BasicResponseModel;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,7 +33,7 @@ public class TransactionsController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/transaction/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/transactions/add", method = RequestMethod.POST)
     public BasicResponseModel addTransaction(@ModelAttribute("Transaction") Transaction transaction,
                                              AuthUser authUser) {
         BasicResponseModel basicResponseModel;
@@ -45,9 +48,13 @@ public class TransactionsController extends BaseController {
                     if (!dateUtils.isValidDatePattern(transaction.getDate())) {
                         basicResponseModel = new BasicResponseModel(Definitions.INVALID_DATE, Definitions.INVALID_DATE_MSG);
                     } else {
-                        transaction.setDate(dateUtils.convertDate2TS(transaction.getDate()));
-                        persist.save(transaction);
-                        basicResponseModel = new BasicResponseModel(transaction);
+                        if (transaction.getTotal() <= 0) {
+                            basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOTAL, Definitions.INVALID_TOTAL_MSG);
+                        } else {
+                            transaction.setDate(dateUtils.convertDate2TS(transaction.getDate()));
+                            persist.save(transaction);
+                            basicResponseModel = new BasicResponseModel(transaction);
+                        }
                     }
                 }
             }
@@ -59,20 +66,20 @@ public class TransactionsController extends BaseController {
         return basicResponseModel;
     }
 
-    @RequestMapping(value = "/transaction/delete", method = RequestMethod.POST)
-    public BasicResponseModel deleteTransaction(@RequestParam int id, @RequestParam boolean delete,
+    @RequestMapping(value = "/transactions/delete", method = RequestMethod.POST)
+    public BasicResponseModel deleteTransaction(@RequestParam int oid, @RequestParam boolean deleted,
                                                 AuthUser authUser) {
         BasicResponseModel basicResponseModel;
-        BasicResponseModel isValidId = idValidator.isValidId(id, Transaction.class);
+        BasicResponseModel isValidId = idValidator.isValidId(oid, Transaction.class);
         if (authUser.getAuthUserError() == null) {
             if (isValidId != null) {
                 basicResponseModel = isValidId;
             } else {
                 List<Transaction> transactionsList = persist.getQuerySession().createQuery("FROM Transaction WHERE id = :id")
-                        .setParameter("id", id)
+                        .setParameter("id", oid)
                         .list();
                 Transaction transaction = transactionsList.get(0);
-                transaction.setDeleted(delete);
+                transaction.setDeleted(deleted);
                 persist.save(transaction);
                 basicResponseModel = new BasicResponseModel(transaction);
             }
@@ -84,11 +91,25 @@ public class TransactionsController extends BaseController {
         return basicResponseModel;
     }
 
-    @RequestMapping(value = "/transaction/getAll", method = RequestMethod.GET)
+    @RequestMapping(value = "/transactions/getAll", method = RequestMethod.GET)
     public BasicResponseModel getAllTransactions(AuthUser authUser) {
         BasicResponseModel basicResponseModel;
+        List<Transaction> allTransactions;
+        Date date;
         if (authUser.getAuthUserError() == null) {
-            List<Transaction> allTransactions = persist.getQuerySession().createQuery("FROM Transaction").list();
+            if (authUser.getAuthUserIsAdmin()) {
+                allTransactions = persist.getQuerySession().createQuery("FROM Transaction")
+                        .list();
+            } else {
+                allTransactions = persist.getQuerySession().createQuery("FROM Transaction WHERE colonyID =: authUserColonyID")
+                        .setParameter("authUserColonyID", authUser.getAuthUserColonyID())
+                        .list();
+            }
+            for (int i = 0; i < allTransactions.size(); i++) {
+                Colony colonyRow = persist.loadObject(Colony.class, allTransactions.get(i).getColonyID());
+                allTransactions.get(i).setColonyName(colonyRow.getHeColonyName());
+            }
+
             basicResponseModel = new BasicResponseModel(allTransactions);
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
@@ -98,16 +119,42 @@ public class TransactionsController extends BaseController {
         return basicResponseModel;
     }
 
-    @RequestMapping(value = "/transaction/getTransaction", method = RequestMethod.POST)
-    public BasicResponseModel getTransaction(@RequestParam int id, AuthUser authUser) {
+    @RequestMapping(value = "/transactions/getAllSortedByDate", method = RequestMethod.GET)
+    public BasicResponseModel getAllSortedByDate(AuthUser authUser) {
         BasicResponseModel basicResponseModel;
-        BasicResponseModel isValidId = idValidator.isValidId(id, Transaction.class);
+        List<Transaction> allTransactions;
+        if (authUser.getAuthUserError() == null) {
+            if (authUser.getAuthUserIsAdmin()) {
+                allTransactions = persist.getQuerySession().createQuery("FROM Transaction ORDER BY oid DESC")
+                        .list();
+            } else {
+                allTransactions = persist.getQuerySession().createQuery("FROM Transaction WHERE colonyID =: authUserColonyID ORDER BY oid DESC")
+                        .setParameter("authUserColonyID", authUser.getAuthUserColonyID())
+                        .list();
+            }
+            for (int i = 0; i < allTransactions.size(); i++) {
+                Colony colonyRow = persist.loadObject(Colony.class, allTransactions.get(i).getColonyID());
+                allTransactions.get(i).setColonyName(colonyRow.getHeColonyName());
+            }
+            basicResponseModel = new BasicResponseModel(allTransactions);
+        } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
+            basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
+        } else {
+            basicResponseModel = new BasicResponseModel(Definitions.NO_PERMISSIONS, Definitions.NO_PERMISSIONS_MSG);
+        }
+        return basicResponseModel;
+    }
+
+    @RequestMapping(value = "/transactions/getTransaction", method = RequestMethod.GET)
+    public BasicResponseModel getTransaction(@RequestParam int oid, AuthUser authUser) {
+        BasicResponseModel basicResponseModel;
+        BasicResponseModel isValidId = idValidator.isValidId(oid, Transaction.class);
         if (authUser.getAuthUserError() == null) {
             if (isValidId != null) {
                 basicResponseModel = isValidId;
             } else {
-                List<Transaction> transactionsList = persist.getQuerySession().createQuery("FROM Transaction WHERE id = :id")
-                        .setParameter("id", id)
+                List<Transaction> transactionsList = persist.getQuerySession().createQuery("FROM Transaction WHERE oid = :oid")
+                        .setParameter("oid", oid)
                         .list();
                 basicResponseModel = new BasicResponseModel(transactionsList.get(0));
             }
@@ -119,7 +166,7 @@ public class TransactionsController extends BaseController {
         return basicResponseModel;
     }
 
-    @RequestMapping(value = "/transaction/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/transactions/update", method = RequestMethod.POST)
     public BasicResponseModel updateColony(@ModelAttribute("Transaction") Transaction transaction,
                                            AuthUser authUser) {
         BasicResponseModel basicResponseModel;
@@ -138,14 +185,18 @@ public class TransactionsController extends BaseController {
                         if (!dateUtils.isValidDatePattern(transaction.getDate())) {
                             basicResponseModel = new BasicResponseModel(Definitions.INVALID_DATE, Definitions.INVALID_DATE_MSG);
                         } else {
-                            List<Transaction> transactionsList = persist.getQuerySession().createQuery("FROM Transaction WHERE id = :id")
-                                    .setParameter("id", transaction.getOid())
-                                    .list();
-                            Transaction oldTransaction = persist.loadObject(Transaction.class, transaction.getOid());
-                            transaction.setDate(dateUtils.convertDate2TS(transaction.getDate()));
-                            oldTransaction.setObject(transaction);
-                            persist.save(oldTransaction);
-                            basicResponseModel = new BasicResponseModel(transactionsList);
+                            if (transaction.getTotal() <= 0) {
+                                basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOTAL, Definitions.INVALID_TOTAL_MSG);
+                            } else {
+                                List<Transaction> transactionsList = persist.getQuerySession().createQuery("FROM Transaction WHERE id = :id")
+                                        .setParameter("id", transaction.getOid())
+                                        .list();
+                                Transaction oldTransaction = persist.loadObject(Transaction.class, transaction.getOid());
+                                transaction.setDate(dateUtils.convertDate2TS(transaction.getDate()));
+                                oldTransaction.setObject(transaction);
+                                persist.save(oldTransaction);
+                                basicResponseModel = new BasicResponseModel(transactionsList);
+                            }
                         }
                     }
                 }

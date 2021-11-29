@@ -9,13 +9,22 @@
         <property name="firstName" column="firstName" type="string"/>
         <property name="lastName" column="lastName" type="string"/>
         <property name="birthDate" column="birthDate" type="string"/>
+        <property name="age" column="age" type="int"/>
         <property name="phone" column="phone" type="string"/>
         <property name="id" column="id" type="string"/>
         <property name="colonyID" column="colonyID" type="int"/>
+        <property name="colonyName" column="colonyName" type="string"/>
         <property name="streetID" column="streetID" type="int"/>
+        <property name="streetName" column="streetName" type="string"/>
         <property name="houseNumber" column="houseNumber" type="string"/>
+        <property name="livesInHousingUnit" type="boolean">
+            <column name="livesInHousingUnit" default="false"/>
+        </property>
+        <property name="apartmentOwner" type="int">
+            <column name="apartmentOwner" default="0"/>
+        </property>
         <property name="deleted" type="boolean">
-            <column name="deleted" default="false" />
+            <column name="deleted" default="false"/>
         </property>
     </class>
 
@@ -28,10 +37,14 @@
         <property name="phone" column="phone" type="string"/>
         <property name="token" column="token" type="string"/>
         <property name="colonyID" column="colonyID" type="int"/>
+        <property name="isAdmin" type="boolean">
+            <column name="isAdmin" default="false"/>
+        </property>
         <property name="deleted" type="boolean">
-            <column name="deleted" default="false" />
+            <column name="deleted" default="false"/>
         </property>
     </class>
+
     <class name="com.project.Models.Colony" table="colonies">
         <id name="oid" type="int" column="oid">
             <generator class="native"/>
@@ -39,7 +52,7 @@
         <property name="enColonyName" column="enColonyName" type="string"/>
         <property name="heColonyName" column="heColonyName" type="string"/>
         <property name="deleted" type="boolean">
-            <column name="deleted" default="false" />
+            <column name="deleted" default="false"/>
         </property>
     </class>
     <class name="com.project.Models.Transaction" table="transactions">
@@ -50,8 +63,9 @@
         <property name="typeAction" column="typeAction" type="string"/>
         <property name="descriptionAction" column="descriptionAction" type="string"/>
         <property name="colonyID" column="colonyId" type="int"/>
+        <property name="total" column="total" type="float"/>
         <property name="deleted" type="boolean">
-            <column name="deleted" default="false" />
+            <column name="deleted" default="false"/>
         </property>
     </class>
 
@@ -62,7 +76,7 @@
         <property name="name" column="name" type="string"/>
         <property name="colonyID" column="colonyId" type="int"/>
         <property name="deleted" type="boolean">
-            <column name="deleted" default="false" />
+            <column name="deleted" default="false"/>
         </property>
     </class>
 </hibernate-mapping>

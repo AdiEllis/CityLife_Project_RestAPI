@@ -7,34 +7,38 @@ public class User extends BaseEntitie {
     private String phone;
     private String token;
     private int colonyID;
-    private String colonyName;
+    private boolean isAdmin;
 
-    public User( String email, String password, String phone, String token, boolean deleted, int colonyID) {
+    public User(String email, String password, String phone, String token,
+                boolean deleted, int colonyID, boolean isAdmin) {
         super(deleted);
         this.password = password;
         this.email = email;
         this.phone = phone;
         this.token = token;
         this.colonyID = colonyID;
-
+        this.isAdmin = isAdmin;
     }
 
     public User() {
         super();
     }
 
-    public User(int id, String email, String password, String phone, String token,int colonyID, boolean deleted) {
+    public User(int id, String email, String password, String phone, String token,
+                int colonyID, Boolean isAdmin, boolean deleted) {
         super(id, deleted);
         this.password = password;
         this.email = email;
         this.phone = phone;
         this.token = token;
         this.colonyID = colonyID;
+        this.isAdmin = isAdmin;
 
     }
+
     //TODO check if colonyID is > 0
     public boolean objectIsEmpty() {
-        if (/*isEmpty(this.colonyID) ||*/ isEmpty(this.password) || isEmpty(this.phone)) {
+        if (isEmpty(this.password) || isEmpty(this.phone)) {
             return true;
         }
         return false;
@@ -88,11 +92,11 @@ public class User extends BaseEntitie {
         this.colonyID = colonyID;
     }
 
-    public String getColonyName() {
-        return colonyName;
+    public boolean getIsAdmin() {
+        return isAdmin;
     }
 
-    public void setColonyName(String colonyName) {
-        this.colonyName = colonyName;
+    public void setIsAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }

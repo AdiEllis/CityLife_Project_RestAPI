@@ -31,17 +31,22 @@ public class StreetsController extends BaseController {
     public BasicResponseModel addStreet(@ModelAttribute("Street") Street street,
                                         AuthUser authUser) {
         BasicResponseModel basicResponseModel;
-        BasicResponseModel isValidColonyId = idValidator.isValidId(street.getColonyID(), Colony.class);
         if (authUser.getAuthUserError() == null) {
             if (street.objectIsEmpty()) {
                 basicResponseModel = new BasicResponseModel(Definitions.MISSING_FIELDS, Definitions.MISSING_FIELDS_MSG);
             } else {
-                if (isValidColonyId != null) {
-                    basicResponseModel = isValidColonyId;
+                List<Street> streetWithSameName = persist.getQuerySession().createQuery("FROM Street WHERE name =: strreetToAddName AND colonyID =: authUserColonyID")
+                        .setParameter("strreetToAddName", street.getName())
+                        .setParameter("authUserColonyID",authUser.getAuthUserColonyID())
+                        .list();
+                System.out.println(streetWithSameName);
+                if (streetWithSameName.size() > 0) {
+                    basicResponseModel = new BasicResponseModel(Definitions.STREET_EXISTS, Definitions.STREET_EXISTS_MSG);
                 } else {
                     persist.save(street);
                     basicResponseModel = new BasicResponseModel(street);
                 }
+
             }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
@@ -52,19 +57,19 @@ public class StreetsController extends BaseController {
     }
 
     @RequestMapping(value = "/streets/delete", method = RequestMethod.POST)
-    public BasicResponseModel deleteStreet(@RequestParam int id, @RequestParam boolean delete,
+    public BasicResponseModel deleteStreet(@RequestParam int oid, @RequestParam boolean deleted,
                                            AuthUser authUser) {
         BasicResponseModel basicResponseModel;
-        BasicResponseModel isValidId = idValidator.isValidId(id, Street.class);
+        BasicResponseModel isValidId = idValidator.isValidId(oid, Street.class);
         if (authUser.getAuthUserError() == null) {
             if (isValidId != null) {
                 basicResponseModel = isValidId;
             } else {
-                List<Street> streetsList = persist.getQuerySession().createQuery("FROM Street WHERE id = :id")
-                        .setParameter("id", id)
+                List<Street> streetsList = persist.getQuerySession().createQuery("FROM Street WHERE oid = :oid")
+                        .setParameter("oid", oid)
                         .list();
                 Street street = streetsList.get(0);
-                street.setDeleted(delete);
+                street.setDeleted(deleted);
                 persist.save(street);
                 basicResponseModel = new BasicResponseModel(street);
             }
@@ -79,14 +84,22 @@ public class StreetsController extends BaseController {
     @RequestMapping(value = "/streets/getAll", method = RequestMethod.GET)
     public BasicResponseModel getAllStreets(AuthUser authUser) {
         BasicResponseModel basicResponseModel;
+        List<Street> allStreets;
         if (authUser.getAuthUserError() == null) {
-            List<Street> allStreets = persist.getQuerySession().createQuery("FROM Street").list();
-            basicResponseModel = new BasicResponseModel(allStreets);
+            if (authUser.getAuthUserIsAdmin()) {
+                allStreets = persist.getQuerySession().createQuery("FROM Street")
+                        .list();
+            } else {
+                allStreets = persist.getQuerySession().createQuery("FROM Street WHERE colonyID =: authUserColonyID")
+                        .setParameter("authUserColonyID",authUser.getAuthUserColonyID())
+                        .list();
+            }
+
             for (int i = 0; i < allStreets.size(); i++) {
                 Colony colonyRow = persist.loadObject(Colony.class, allStreets.get(i).getColonyID());
                 allStreets.get(i).setColonyName(colonyRow.getHeColonyName());
-
             }
+            basicResponseModel = new BasicResponseModel(allStreets);
 
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
             basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
@@ -96,18 +109,40 @@ public class StreetsController extends BaseController {
         return basicResponseModel;
     }
 
-    @RequestMapping(value = "/streets/getStreet", method = RequestMethod.POST)
-    public BasicResponseModel getStreet(@RequestParam int id, AuthUser authUser) {
+    @RequestMapping(value = "/streets/getStreet", method = RequestMethod.GET)
+    public BasicResponseModel getStreet(@RequestParam int oid, AuthUser authUser) {
         BasicResponseModel basicResponseModel;
-        BasicResponseModel isValidId = idValidator.isValidId(id, Colony.class);
+        BasicResponseModel isValidId = idValidator.isValidId(oid, Street.class);
         if (authUser.getAuthUserError() == null) {
             if (isValidId != null) {
                 basicResponseModel = isValidId;
             } else {
-                List<Street> streetsList = persist.getQuerySession().createQuery("FROM Street WHERE id = :id")
-                        .setParameter("id", id)
+                List<Street> streetsList = persist.getQuerySession().createQuery("FROM Street WHERE oid = :oid")
+                        .setParameter("oid", oid)
                         .list();
                 basicResponseModel = new BasicResponseModel(streetsList.get(0));
+
+            }
+        } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {
+            basicResponseModel = new BasicResponseModel(Definitions.INVALID_TOKEN, Definitions.INVALID_TOKEN_MSG);
+        } else {
+            basicResponseModel = new BasicResponseModel(Definitions.NO_PERMISSIONS, Definitions.NO_PERMISSIONS_MSG);
+        }
+        return basicResponseModel;
+    }
+
+    @RequestMapping(value = "/streets/getStreetsByColonyID", method = RequestMethod.GET)
+    public BasicResponseModel getStreetByColonyID(@RequestParam int colonyID, AuthUser authUser) {
+        BasicResponseModel basicResponseModel;
+        BasicResponseModel isValidId = idValidator.isValidId(colonyID, Colony.class);
+        if (authUser.getAuthUserError() == null) {
+            if (isValidId != null) {
+                basicResponseModel = isValidId;
+            } else {
+                List<Street> streetsList = persist.getQuerySession().createQuery("FROM Street WHERE colonyID = :colonyID")
+                        .setParameter("colonyID", colonyID)
+                        .list();
+                basicResponseModel = new BasicResponseModel(streetsList);
 
             }
         } else if (authUser.getAuthUserError() == Definitions.INVALID_TOKEN) {

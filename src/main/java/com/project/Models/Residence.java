@@ -4,6 +4,7 @@ public class Residence extends BaseEntitie {
     private String firstName;
     private String lastName;
     private String birthDate;
+    private int age;
     private String phone;
     private String id;
     private int colonyID;
@@ -11,9 +12,15 @@ public class Residence extends BaseEntitie {
     private int streetID;
     private String streetName;
     private String houseNumber;
+    private int apartmentOwner;
+    private boolean livesInHousingUnit;
 
-    public Residence() {}
-    public Residence(int oid, boolean deleted, String firstName, String lastName, String birthDate, String phone, String id, int colonyID, int streetID, String houseNumber) {
+    public Residence() {
+    }
+
+    public Residence(int oid, boolean deleted, String firstName, String lastName,
+                     String birthDate, String phone, String id, int colonyID,
+                     int streetID, String houseNumber, int apartmentOwner, boolean livesInHousingUnit) {
         super(oid, deleted);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -23,9 +30,13 @@ public class Residence extends BaseEntitie {
         this.colonyID = colonyID;
         this.streetID = streetID;
         this.houseNumber = houseNumber;
+        this.apartmentOwner = apartmentOwner;
+        this.livesInHousingUnit = livesInHousingUnit;
     }
 
-    public Residence(String firstName, String lastName, String birthDate, String phone, String id,int colonyID, int streetID, String houseNumber, boolean deleted) {
+    public Residence(String firstName, String lastName, String birthDate,
+                     String phone, String id, int colonyID, int streetID,
+                     String houseNumber,int apartmentOwner,boolean livesInHousingUnit, boolean deleted) {
         super(deleted);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -35,10 +46,13 @@ public class Residence extends BaseEntitie {
         this.colonyID = colonyID;
         this.streetID = streetID;
         this.houseNumber = houseNumber;
+        this.apartmentOwner = apartmentOwner;
+        this.livesInHousingUnit = livesInHousingUnit;
     }
+
     public boolean objectIsEmpty() {
         //TODO make id > 0
-        if (isEmpty(this.firstName) ||  isEmpty(this.lastName) || isEmpty(this.birthDate) || isEmpty(this.phone) /*|| isEmpty(this.id)*/) {
+        if (isEmpty(this.firstName) || isEmpty(this.lastName) || isEmpty(this.birthDate) || isEmpty(this.phone) || isEmpty(this.id)) {
             return true;
         }
         return false;
@@ -49,6 +63,14 @@ public class Residence extends BaseEntitie {
             return true;
         else
             return false;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public int getColonyID() {
@@ -129,5 +151,21 @@ public class Residence extends BaseEntitie {
 
     public void setStreetName(String streetName) {
         this.streetName = streetName;
+    }
+
+    public int getApartmentOwner() {
+        return apartmentOwner;
+    }
+
+    public void setApartmentOwner(int apartmentOwner) {
+        this.apartmentOwner = apartmentOwner;
+    }
+
+    public boolean isLivesInHousingUnit() {
+        return livesInHousingUnit;
+    }
+
+    public void setLivesInHousingUnit(boolean livesInHousingUnit) {
+        this.livesInHousingUnit = livesInHousingUnit;
     }
 }

@@ -7,7 +7,6 @@ import com.project.Persist;
 import com.project.Utils.Definitions;
 import com.project.Utils.PasswordAuthentication;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +24,7 @@ public class AuthController extends BaseController {
 
     EmailValidator validator = EmailValidator.getInstance();
 
-        @RequestMapping(value = "/authenticate/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/authenticate/login", method = RequestMethod.POST)
     public BasicResponseModel getUser(@RequestParam String email, @RequestParam char[] password) {
         BasicResponseModel responseModel;
         if (email.length() == 0 || password.length == 0) {
@@ -51,7 +50,9 @@ public class AuthController extends BaseController {
                             AuthUser authUser = new AuthUser(
                                     userRow.getOid(),
                                     userRow.getToken(),
-                                    userRow.getEmail()
+                                    userRow.getEmail(),
+                                    userRow.getColonyID(),
+                                    userRow.getIsAdmin()
                             );
                             responseModel = new BasicResponseModel(authUser);
                         } else {

@@ -5,11 +5,24 @@ public class AuthUser {
     private String authUserEmail;
     private Integer authUserError;
     private String authUserToken;
+    private int authUserColonyID;
+    private boolean authUserIsAdmin;
 
-    public AuthUser(int authUserId, String authUserToken, String authUserEmail) {
+    public AuthUser(int authUserId, String authUserToken,
+                    String authUserEmail, int colonyID, boolean isAdmin) {
         this.authUserId = authUserId;
         this.authUserToken = authUserToken;
         this.authUserEmail = authUserEmail;
+        this.authUserColonyID = colonyID;
+        this.authUserIsAdmin = isAdmin;
+    }
+
+    public boolean getAuthUserIsAdmin() {
+        return authUserIsAdmin;
+    }
+
+    public void setAuthUserIsAdmin(boolean admin) {
+        authUserIsAdmin = admin;
     }
 
     public AuthUser(Integer authUserError) {
@@ -48,6 +61,14 @@ public class AuthUser {
         this.authUserToken = authUserToken;
     }
 
+    public int getAuthUserColonyID() {
+        return authUserColonyID;
+    }
+
+    public void setAuthUserColonyID(int colonyID) {
+        colonyID = colonyID;
+    }
+
     @Override
     public String toString() {
         return "AuthUser{" +
@@ -55,6 +76,8 @@ public class AuthUser {
                 ", authUserEmail='" + authUserEmail + '\'' +
                 ", authUserError=" + authUserError +
                 ", authUserToken='" + authUserToken + '\'' +
+                ", colonyID=" + authUserColonyID +
+                ", isAdmin=" + authUserIsAdmin +
                 '}';
     }
 }
